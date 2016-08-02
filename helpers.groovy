@@ -98,3 +98,5 @@ def slackOnError(repoName, env, currentBuild) {
         }
     }
 }
+
+return this
