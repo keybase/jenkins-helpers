@@ -108,9 +108,9 @@ def slackOnError(repoName, env, currentBuild) {
     if (env.CHANGE_ID) {
         def author = env.CHANGE_AUTHOR
         if (slackUserLookup.containsKey(author)) {
-            author = slackUserLookup[author]
+            author = "<@${slackUserLookup[author]}>"
         }
-        message = "<${env.CHANGE_URL}|${env.CHANGE_TITLE}>\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}> by <@${author}>"
+        message = "<${env.CHANGE_URL}|${env.CHANGE_TITLE}>\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}> by ${author}"
     } else if (env.BRANCH_NAME == "master" && env.AUTHOR_NAME) {
         def commitUrl = "https://github.com/keybase/${repoName}/commit/${env.COMMIT_HASH}"
         color = "danger"
