@@ -72,13 +72,46 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
     node(label, wrappedClosure)
 }
 
+slackUserLookup = [:]
+slackUserLookup['aalness'] = 'andy'
+slackUserLookup['akalin-keybase'] = 'akalin'
+slackUserLookup['chrisnojima'] = 'cnojima'
+slackUserLookup['chromakode'] = 'mgood'
+slackUserLookup['cjb'] = 'cjb'
+slackUserLookup['gabriel'] = 'gabriel'
+slackUserLookup['jinyangli'] = 'jinyang'
+slackUserLookup['jzila'] = 'jzila'
+slackUserLookup['malgorithms'] = 'chriscoyne'
+slackUserLookup['marcopolo'] = 'marco'
+slackUserLookup['maxtaco'] = 'max'
+slackUserLookup['mlsteele'] = 'miles'
+slackUserLookup['mmaxim'] = 'mike'
+slackUserLookup['oconnor663'] = 'jack'
+slackUserLookup['patrickxb'] = 'patrick'
+slackUserLookup['songgao'] = 'songgao'
+slackUserLookup['strib'] = 'strib'
+slackUserLookup['zanderz'] = 'steve'
+slackUserLookup['cbostrander'] = 'caley'
+slackUserLookup['cecileboucheron'] = 'cecile'
+slackUserLookup['taruti'] = 'taru'
+slackUserLookup['awendland'] = 'awendland'
+slackUserLookup['jxguan'] = 'guan'
+slackUserLookup['mpcsh'] = 'mpcsh'
+
 def slackOnError(repoName, env, currentBuild) {
+    def cause = getCauseString(currentBuild)
+    if (cause == "upstream") {
+        return
+    }
     def message = null
     def color = "warning"
-    def cause = getCauseString(currentBuild)
     if (env.CHANGE_ID) {
-        message = "<${env.CHANGE_URL}|${env.CHANGE_TITLE}>\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}> by ${env.CHANGE_AUTHOR}"
-    } else if (env.BRANCH_NAME == "master" && cause != "upstream" && env.AUTHOR_NAME) {
+        def author = env.CHANGE_AUTHOR
+        if (slackUserLookup.containsKey(author)) {
+            author = "<@${slackUserLookup[author]}>"
+        }
+        message = "<${env.CHANGE_URL}|${env.CHANGE_TITLE}>\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}> by ${author}"
+    } else if (env.BRANCH_NAME == "master" && env.AUTHOR_NAME) {
         def commitUrl = "https://github.com/keybase/${repoName}/commit/${env.COMMIT_HASH}"
         color = "danger"
         message = "*BROKEN: master on keybase/${repoName}*\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}>\n Commit: <${commitUrl}|${env.COMMIT_HASH}>\n Author: ${env.AUTHOR_NAME} &lt;${env.AUTHOR_EMAIL}&gt;"
