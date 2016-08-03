@@ -69,7 +69,11 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
             }
         }
     }
-    node(label, wrappedClosure)
+    try {
+        node(label, wrappedClosure)
+    } finally {
+        deleteDir()
+    }
 }
 
 slackUserLookup = [:]
