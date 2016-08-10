@@ -155,13 +155,7 @@ def withKbweb(closure) {
 
 def logContainer(container) {
     println "${container} logs:"
-    sh "docker-compose ps -q ${container}.local > ${container}.txt"
-    containerString = readFile("${container}.txt")
-    println "Containers: ${containerString}"
-    containers = containerString.tokenize()
-    for (containerId in containers) {
-        sh "docker logs --tail 100000 ${containerId}"
-    }
+    //sh "docker-compose logs --tail 100000 ${container}.local"
 }
 
 return this
