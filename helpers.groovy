@@ -106,7 +106,7 @@ def slackOnError(repoName, env, currentBuild) {
     def message = null
     def color = "warning"
     if (env.CHANGE_ID) {
-        def author = env.CHANGE_AUTHOR
+        def author = env.CHANGE_AUTHOR.toLowerCase()
         if (slackUserLookup.containsKey(author)) {
             author = "<@${slackUserLookup[author]}>"
         }
@@ -130,6 +130,32 @@ def slackOnError(repoName, env, currentBuild) {
             ])
         }
     }
+}
+
+def withKbweb(closure) {
+    try {
+        retry(5) {
+            sh "docker-compose up -d mysql.local"
+        }
+        sh "docker-compose up -d kbweb.local"
+
+        closure()
+    } catch (ex) {
+        println "Dockers:"
+        sh "docker ps -a"
+        sh "docker-compose stop"
+        logContainer('mysql')
+        logContainer('gregor')
+        logContainer('kbweb')
+        throw ex
+    } finally {
+        sh "docker-compose down"
+    }
+}
+
+def logContainer(container) {
+    println "${container} logs:"
+    //sh "docker-compose logs --tail 100000 ${container}.local"
 }
 
 return this
