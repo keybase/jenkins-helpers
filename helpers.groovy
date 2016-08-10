@@ -144,15 +144,23 @@ def withKbweb(closure) {
         println "Dockers:"
         sh "docker ps -a"
         sh "docker-compose stop"
-        println "Gregor logs:"
-        sh "docker-compose logs --tail 100000 gregor.local"
-        println "MySQL logs:"
-        sh "docker-compose logs --tail 100000 mysql.local"
-        println "KBweb logs:"
-        sh "docker-compose logs --tail 100000 kbweb.local"
+        logContainer('mysql')
+        logContainer('gregor')
+        logContainer('kbweb')
         throw ex
     } finally {
         sh "docker-compose down"
+    }
+}
+
+def logContainer(container) {
+    println "${container} logs:"
+    sh "docker-compose ps -q ${container}.local > ${container}.txt"
+    containerString = readFile("${container}.txt")
+    println "Containers: ${containerString}"
+    containers = containerString.tokenize()
+    for (containerId in containers) {
+        sh "docker logs --tail 100000 ${containerId}"
     }
 }
 
