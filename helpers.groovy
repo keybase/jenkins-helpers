@@ -72,6 +72,20 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
     node(label, wrappedClosure)
 }
 
+def retryCleanly(numTimes, closure) {
+    for (i = 0; i < numTimes; i++) {
+        try {
+            closure()
+            break
+        } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException ex) {
+            throw ex
+        } catch (ex) {
+            println "Failed retryCleanly on step ${i}. Exception: ${ex.getMessage()}"
+            continue
+        }
+    }
+}
+
 slackUserLookup = [:]
 slackUserLookup['aalness'] = 'andy'
 slackUserLookup['akalin-keybase'] = 'akalin'
