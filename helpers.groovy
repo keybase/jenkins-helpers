@@ -155,7 +155,8 @@ def withKbweb(closure) {
 
 def logContainer(container) {
     println "${container} logs:"
-    //sh "docker-compose logs --tail 100000 ${container}.local"
+    sh "docker-compose logs ${container}.local | gzip > ${container}.log.gz"
+    archive("${container}.log.gz")
 }
 
 return this
