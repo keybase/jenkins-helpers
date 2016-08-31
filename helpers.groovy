@@ -51,7 +51,9 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
             try {
                 deleteDir()
-                closure()
+                timeout(30) {
+                    closure()
+                }
             } catch (ex) {
                 try {
                     handleError()
@@ -154,7 +156,6 @@ def withKbweb(closure) {
 }
 
 def logContainer(container) {
-    println "${container} logs:"
     sh "docker-compose logs ${container}.local | gzip > ${container}.log.gz"
     archive("${container}.log.gz")
 }
