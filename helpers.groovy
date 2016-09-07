@@ -52,7 +52,7 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
             wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
                 try {
                     deleteDir()
-                    timeout(30) {
+                    timeout(45) {
                         closure()
                     }
                 } catch (ex) {
