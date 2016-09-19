@@ -136,11 +136,7 @@ def slackOnError(repoName, env, currentBuild) {
         message = "*BROKEN: master on keybase/${repoName}*\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}>\n Commit: <${commitUrl}|${env.COMMIT_HASH}>\n Author: ${env.AUTHOR_NAME} &lt;${env.AUTHOR_EMAIL}&gt;"
     }
     if (message) {
-        slackMessage([
-            channel: "#ci-notify",
-            color: color,
-            message: message
-        ])
+        slackMessage("#ci-notify", color, message)
     }
 }
 
