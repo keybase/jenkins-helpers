@@ -76,6 +76,21 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
     node(label, wrappedClosure)
 }
 
+def slackMessage(channel, color, message) {
+    withCredentials([[$class: 'StringBinding',
+        credentialsId: 'SLACK_INTEGRATION_TOKEN',
+        variable: 'SLACK_INTEGRATION_TOKEN',
+    ]]) {
+        slackSend([
+            channel: channel,
+            color: color,
+            message: message,
+            teamDomain: "keybase",
+            token: "${env.SLACK_INTEGRATION_TOKEN}"
+        ])
+    }
+}
+
 slackUserLookup = [:]
 slackUserLookup['aalness'] = 'andy'
 slackUserLookup['akalin-keybase'] = 'akalin'
@@ -121,18 +136,11 @@ def slackOnError(repoName, env, currentBuild) {
         message = "*BROKEN: master on keybase/${repoName}*\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}>\n Commit: <${commitUrl}|${env.COMMIT_HASH}>\n Author: ${env.AUTHOR_NAME} &lt;${env.AUTHOR_EMAIL}&gt;"
     }
     if (message) {
-        withCredentials([[$class: 'StringBinding',
-            credentialsId: 'SLACK_INTEGRATION_TOKEN',
-            variable: 'SLACK_INTEGRATION_TOKEN',
-        ]]) {
-            slackSend([
-                channel: "#ci-notify",
-                color: color,
-                message: message,
-                teamDomain: "keybase",
-                token: "${env.SLACK_INTEGRATION_TOKEN}"
-            ])
-        }
+        slackMessage([
+            channel: "#ci-notify",
+            color: color,
+            message: message
+        ])
     }
 }
 
