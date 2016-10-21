@@ -48,27 +48,33 @@ def getCauseString(currentBuild) {
 
 def nodeWithCleanup(label, handleError, cleanup, closure) {
     def wrappedClosure = {
-        timestamps {
-            wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
-                try {
-                    deleteDir()
-                    timeout(45) {
-                        closure()
-                    }
-                } catch (ex) {
+        def build_path = pwd()
+        dir('..') {
+            build_path = [pwd(), env.JOB_NAME, env.BUILD_NUMBER].join('/')
+        }
+        ws(build_path) {
+            timestamps {
+                wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'XTerm']) {
                     try {
-                        handleError()
-                    } catch (ex2) {
-                        println "Unable to handle error: ${ex2.getMessage()}"
+                        deleteDir()
+                        timeout(45) {
+                            closure()
+                        }
+                    } catch (ex) {
+                        try {
+                            handleError()
+                        } catch (ex2) {
+                            println "Unable to handle error: ${ex2.getMessage()}"
+                        }
+                        throw ex
+                    } finally {
+                        try {
+                            cleanup()
+                        } catch (ex2) {
+                            println "Unable to cleanup: ${ex2.getMessage()}"
+                        }
+                        deleteDir()
                     }
-                    throw ex
-                } finally {
-                    try {
-                        cleanup()
-                    } catch (ex2) {
-                        println "Unable to cleanup: ${ex2.getMessage()}"
-                    }
-                    deleteDir()
                 }
             }
         }
