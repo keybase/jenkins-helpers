@@ -82,6 +82,24 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
     node(label, wrappedClosure)
 }
 
+def nodeWithDockerCleanup(label, handleError, cleanup, closure) {
+    def wrappedCleanup = {
+        sh 'docker rm -v $(docker ps --filter status=exited -q 2>/dev/null) 2>/dev/null || echo "No Docker containers to remove"'
+        sh 'docker rmi $(docker images --filter dangling=true -q --no-trunc 2>/dev/null) 2>/dev/null || echo "No Docker images to remove"'
+        sh 'docker volume rm $(docker volume ls -qf dangling=true 2>/dev/null) 2>/dev/null || echo "No Docker volumes to remove"'
+        cleanup()
+    }
+    nodeWithCleanup(label, handleError, wrappedCleanup, closure)
+}
+
+def rootLinuxNode(env, handleError, cleanup, closure) {
+    if (env.CHANGE_TITLE && env.CHANGE_TITLE.contains('[ci-skip]')) {
+        println "Skipping build because PR title contains [ci-skip]"
+    } else {
+        nodeWithDockerCleanup("linux", handleError, cleanup, closure)
+    }
+}
+
 def slackMessage(channel, color, message) {
     withCredentials([[$class: 'StringBinding',
         credentialsId: 'SLACK_INTEGRATION_TOKEN',
