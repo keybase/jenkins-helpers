@@ -209,6 +209,9 @@ def getChanges(commitHash, changeTarget) {
     }
     try {
         def diffFiles = sh(returnStdout: true, script: "git diff --name-only \"${changeBase}...${commitHash}\" .").trim()
+        if (diffFiles.size() == 0) {
+            return []
+        }
         return diffFiles.split("[\\r\\n]+")
     } catch(e) {
         println "no changes"
