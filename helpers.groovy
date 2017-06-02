@@ -192,4 +192,26 @@ def logContainer(container) {
     archive("${container}.log.gz")
 }
 
+// check if the current directory has any git changes
+def getChanges(commitHash, changeTarget) {
+    if (changeTarget == null) {
+        println "Missing changeTarget, so we're on master."
+        return []
+    }
+    def branchName = "origin/$changeTarget"
+    def changeBase = sh(returnStdout: true, script: "git merge-base $branchName $commitHash").trim()
+    println "Received commit $commitHash, change target $changeTarget, change base $changeBase"
+
+    retry(3) {
+        sh "git fetch"
+    }
+    try {
+        def diffFiles = sh(returnStdout: true, script: "git diff --name-only \"${changeBase}...${commitHash}\" .").trim()
+        return diffFiles.split("[\\r\\n]+")
+    } catch(e) {
+        println "no changes"
+        return null
+    }
+}
+
 return this
