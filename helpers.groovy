@@ -192,4 +192,31 @@ def logContainer(container) {
     archive("${container}.log.gz")
 }
 
+// Check if the current directory has any git changes. Return a list of all the
+// files changed, if any.  If we're on the master branch, return a list with a
+// single item: "master". This is to allow length of list checks.
+def getChanges(commitHash, changeTarget) {
+    if (changeTarget == null) {
+        println "Missing changeTarget, so we're on master."
+        return ["master"]
+    }
+    def branchName = "origin/$changeTarget"
+    def changeBase = sh(returnStdout: true, script: "git merge-base $branchName $commitHash").trim()
+    println "Received commit $commitHash, change target $changeTarget, change base $changeBase"
+
+    retry(3) {
+        sh "git fetch"
+    }
+    try {
+        def diffFiles = sh(returnStdout: true, script: "git diff --name-only \"${changeBase}...${commitHash}\" .").trim()
+        if (diffFiles.size() == 0) {
+            return []
+        }
+        return diffFiles.split("[\\r\\n]+")
+    } catch(e) {
+        println "no changes"
+        return []
+    }
+}
+
 return this
