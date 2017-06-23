@@ -171,6 +171,8 @@ def withKbweb(closure) {
         retry(5) {
             sh "docker-compose up -d mysql.local"
         }
+        // Give MySQL a few seconds to start up.
+        sleep(10)
         sh "docker-compose up -d kbweb.local"
 
         closure()
