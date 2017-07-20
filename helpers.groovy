@@ -201,7 +201,9 @@ def getChanges(commitHash, changeTarget) {
     println "Missing changeTarget, so we're on master."
     return ["master"]
   }
-  def branchName = "origin/$changeTarget"
+  sh "git fetch origin +refs/heads/master:refs/remotes/origin/master"
+  sh "git config --list"
+  def branchName = sh(returnStdout: true, script: "git rev-list -n 1 origin/master").trim()
   def changeBase = sh(returnStdout: true, script: "git merge-base $branchName $commitHash").trim()
   println "Received commit $commitHash, change target $changeTarget, change base $changeBase"
 
