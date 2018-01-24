@@ -179,17 +179,17 @@ def withKbweb(closure) {
     println "Dockers:"
     sh "docker ps -a"
     sh "docker-compose stop"
-    logContainer('mysql')
-    logContainer('gregor')
-    logContainer('kbweb')
+    logContainer('docker-compose', 'mysql')
+    logContainer('docker-compose', 'gregor')
+    logContainer('docker-compose', 'kbweb')
     throw ex
   } finally {
     sh "docker-compose down"
   }
 }
 
-def logContainer(container) {
-  sh "docker-compose logs ${container}.local | gzip > ${container}.log.gz"
+def logContainer(composefile, container) {
+  sh "docker-compose -f ${composefile}.yml logs ${container}.local | gzip > ${container}.log.gz"
   archive("${container}.log.gz")
 }
 
