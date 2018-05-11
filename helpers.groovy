@@ -222,4 +222,15 @@ def getChanges(commitHash, changeTarget) {
   }
 }
 
+def hasChanges(subdir, env) {
+    dir(subdir) {
+        def changes = getChanges(env.COMMIT_HASH, env.CHANGE_TARGET)
+        println "Number of changes: " + changes.size()
+        if (changes.size() == 0) {
+            return false
+        }
+        return true
+    }
+}
+
 return this
