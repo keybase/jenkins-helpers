@@ -72,7 +72,11 @@ def nodeWithCleanup(label, handleError, cleanup, closure) {
           } catch (ex2) {
             println "Unable to cleanup: ${ex2.getMessage()}"
           }
-          deleteDir()
+          try {
+            deleteDir()
+          } catch (ex2) {
+            println "Unable to remove directory: ${ex2.getMessage()}"
+          }
         }
       }
     }
