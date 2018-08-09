@@ -147,10 +147,11 @@ slackUserLookup['zapu'] = 'michal'
 slackUserLookup['modalduality'] = 'modalduality'
 slackUserLookup['joshblum'] = 'Josh Blum'
 slackUserLookup['xgess'] = 'xgess'
-slackUserLookup['buoyad'] = 'ayoubd'
-slackUserLookup['adamjspooner'] = 'danny'
+slackUserLookup['buoyad'] = 'danny'
+slackUserLookup['adamjspooner'] = 'spooner'
 slackUserLookup['nathunsmitty'] = 'nathan'
 slackUserLookup['heronhaye'] = 'modalduality'
+slackUserLookup['amarcedone'] = 'antonio'
 
 def slackOnError(repoName, env, currentBuild) {
   def cause = getCauseString(currentBuild)
