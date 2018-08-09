@@ -152,6 +152,7 @@ slackUserLookup['adamjspooner'] = 'spooner'
 slackUserLookup['nathunsmitty'] = 'nathan'
 slackUserLookup['heronhaye'] = 'modalduality'
 slackUserLookup['amarcedone'] = 'antonio'
+slackUserLookup['thebearjew'] = 'jacob'
 
 def slackOnError(repoName, env, currentBuild) {
   def cause = getCauseString(currentBuild)
