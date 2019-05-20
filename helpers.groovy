@@ -177,27 +177,8 @@ def slackOnError(repoName, env, currentBuild) {
   }
 }
 
-def withKbweb(closure) {
-  try {
-    retry(5) {
-      sh "docker-compose up -d mysql.local"
-    }
-    // Give MySQL a few seconds to start up.
-    sleep(10)
-    sh "docker-compose up -d kbweb.local"
-
-    closure()
-  } catch (ex) {
-    println "Dockers:"
-    sh "docker ps -a"
-    sh "docker-compose stop"
-    logContainer('docker-compose', 'mysql')
-    logContainer('docker-compose', 'gregor')
-    logContainer('docker-compose', 'kbweb')
-    throw ex
-  } finally {
-    sh "docker-compose down"
-  }
+def containerName(composefile, container) {
+  return sh(returnStdout: true, script: "docker-compose -f ${composefile}.yml ps -q ${container}.local")
 }
 
 def logContainer(composefile, container) {
