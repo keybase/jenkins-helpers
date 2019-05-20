@@ -178,7 +178,7 @@ def slackOnError(repoName, env, currentBuild) {
 }
 
 def containerName(composefile, container) {
-  return sh(returnStdout: true, script: "docker-compose -f ${composefile}.yml ps -q ${container}.local")
+  return sh(returnStdout: true, script: "docker-compose -f ${composefile}.yml ps -q ${container}.local").trim()
 }
 
 def logContainer(composefile, container) {
