@@ -217,17 +217,16 @@ def getChanges(commitHash, changeTarget) {
     println "Missing changeTarget, so we're on master."
     return ["master"]
   }
-  sh "git fetch origin +refs/heads/master:refs/remotes/origin/master"
-  sh "git config --list"
-  def branchName = sh(returnStdout: true, script: "git rev-list -n 1 origin/master").trim()
-  def changeBase = sh(returnStdout: true, script: "git merge-base $branchName $commitHash").trim()
-  println "Received commit $commitHash, change target $changeTarget, change base $changeBase"
+  fetchChangeTarget(changeTarget)
+  def baseCommitHash = sh(returnStdout: true, script: "git rev-parse origin/${changeTarget}").trim()
+  def changeMergeBase = sh(returnStdout: true, script: "git merge-base $baseCommitHash $commitHash").trim()
+  println "Received commit $commitHash, change target $changeTarget, change base $changeMergeBase"
 
   retry(3) {
     sh "git fetch"
   }
   try {
-    def diffFiles = sh(returnStdout: true, script: "git diff --name-only \"${changeBase}...${commitHash}\" .").trim()
+    def diffFiles = sh(returnStdout: true, script: "bash -c \"set -o pipefail; git merge-tree $changeMergeBase $baseCommitHash $commitHash | grep '[0-9]\\+\\s[0-9a-f]\\{40\\}' | awk '{print \\\$4}'\"").trim()
     if (diffFiles.size() == 0) {
       return []
     }
@@ -247,6 +246,14 @@ def getChangesForSubdir(subdir, env) {
 def hasChanges(subdir, env) {
     def changes = getChangesForSubdir(subdir, env)
     return changes.size() != 0
+}
+
+def fetchChangeTarget(changeTarget) {
+  if (changeTarget) {
+    // Load list of packages that changed.
+    sh "git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10"
+    sh "git fetch origin ${changeTarget}"
+  }
 }
 
 return this
