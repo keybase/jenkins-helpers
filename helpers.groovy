@@ -102,59 +102,10 @@ def rootLinuxNode(env, handleError, cleanup, closure) {
   }
 }
 
-def slackMessage(channel, color, message) {
-  withCredentials([[$class: 'StringBinding',
-    credentialsId: 'SLACK_INTEGRATION_TOKEN',
-    variable: 'SLACK_INTEGRATION_TOKEN',
-  ]]) {
-    slackSend([
-      channel: channel,
-      color: color,
-      message: message,
-      teamDomain: "keybase",
-      token: "${env.SLACK_INTEGRATION_TOKEN}"
-    ])
-  }
-}
-
-slackUserLookup = [:]
-slackUserLookup['aalness'] = 'andy'
-slackUserLookup['akalin-keybase'] = 'akalin'
-slackUserLookup['chrisnojima'] = 'cnojima'
-slackUserLookup['chromakode'] = 'mgood'
-slackUserLookup['cjb'] = 'cjb'
-slackUserLookup['gabriel'] = 'gabriel'
-slackUserLookup['jinyangli'] = 'jinyang'
-slackUserLookup['jzila'] = 'jzila'
-slackUserLookup['malgorithms'] = 'chriscoyne'
-slackUserLookup['marcopolo'] = 'marco'
-slackUserLookup['maxtaco'] = 'max'
-slackUserLookup['mlsteele'] = 'miles'
-slackUserLookup['mmaxim'] = 'mike'
-slackUserLookup['oconnor663'] = 'jack'
-slackUserLookup['patrickxb'] = 'patrick'
-slackUserLookup['songgao'] = 'songgao'
-slackUserLookup['strib'] = 'strib'
-slackUserLookup['zanderz'] = 'steve'
-slackUserLookup['cbostrander'] = 'caley'
-slackUserLookup['cecileboucheron'] = 'cecile'
-slackUserLookup['taruti'] = 'taru'
-slackUserLookup['awendland'] = 'awendland'
-slackUserLookup['jxguan'] = 'guan'
-slackUserLookup['mpcsh'] = 'mpcsh'
-slackUserLookup['shazow'] = 'shazow'
-slackUserLookup['zapu'] = 'michal'
-slackUserLookup['modalduality'] = 'modalduality'
-slackUserLookup['joshblum'] = 'Josh Blum'
-slackUserLookup['xgess'] = 'xgess'
-slackUserLookup['buoyad'] = 'danny'
-slackUserLookup['adamjspooner'] = 'spooner'
-slackUserLookup['nathunsmitty'] = 'nathan'
-slackUserLookup['heronhaye'] = 'modalduality'
-slackUserLookup['amarcedone'] = 'antonio'
-slackUserLookup['thebearjew'] = 'jacob'
-
 def slackOnError(repoName, env, currentBuild) {
+  // Disable for now
+  return
+
   def cause = getCauseString(currentBuild)
   if (cause == "upstream") {
     return
@@ -173,7 +124,7 @@ def slackOnError(repoName, env, currentBuild) {
     message = "*BROKEN: master on keybase/${repoName}*\n :small_red_triangle: Test failed: <${env.BUILD_URL}|${env.JOB_NAME} ${env.BUILD_DISPLAY_NAME}>\n Commit: <${commitUrl}|${env.COMMIT_HASH}>\n Author: ${env.AUTHOR_NAME} &lt;${env.AUTHOR_EMAIL}&gt;"
   }
   if (message) {
-    slackMessage("#ci-notify", color, message)
+    // TODO: notify in here if needed
   }
 }
 
