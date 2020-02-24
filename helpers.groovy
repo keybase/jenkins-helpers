@@ -2,7 +2,7 @@ def waitForURL(prefix, url) {
   return waitForURLWithTimeout(prefix, url, 300)
 }
 
-def waitForURLWithTimeout(prefix, url, timeout) {
+def waitForURLWithTimeout(prefix, url, waitFor) {
   if (isUnix()) {
     sh """ bash -c '
       slept=0
