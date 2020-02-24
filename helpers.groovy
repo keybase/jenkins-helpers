@@ -1,5 +1,5 @@
 def waitForURL(prefix, url) {
-return waitForURLWithTimeout(prefix, url, 300)
+  return waitForURLWithTimeout(prefix, url, 300)
 }
 
 def waitForURLWithTimeout(prefix, url, timeout) {
