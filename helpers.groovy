@@ -1,5 +1,8 @@
 def waitForURL(prefix, url) {
-  def waitFor = 300;
+  return waitForURLWithTimeout(prefix, url, 300)
+}
+
+def waitForURLWithTimeout(prefix, url, waitFor) {
   if (isUnix()) {
     sh """ bash -c '
       slept=0
