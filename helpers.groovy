@@ -134,33 +134,40 @@ def slackOnError(repoName, env, currentBuild) {
 def withKbweb(closure) {
   try {
     retry(5) {
-      sh "docker-compose up -d mysql.local"
+      sh "docker compose up -d mysql.local"
     }
     // Give MySQL a few seconds to start up.
     sleep(10)
-    sh "docker-compose up -d kbweb.local"
+    sh "docker compose up -d kbweb.local"
 
     closure()
   } catch (ex) {
     println "Dockers:"
     sh "docker ps -a"
-    sh "docker-compose stop"
+    sh "docker compose stop"
     logContainer('docker-compose', 'mysql')
     logContainer('docker-compose', 'gregor')
     logContainer('docker-compose', 'kbweb')
     throw ex
   } finally {
-    sh "docker-compose down"
+    sh "docker compose down"
   }
 }
 
 def containerName(composefile, container) {
-  return sh(returnStdout: true, script: "docker-compose -f ${composefile}.yml ps -q ${container}.local").trim()
+  return sh(returnStdout: true, script: "docker compose -f ${composefile}.yml ps -q ${container}.local").trim()
 }
 
 def logContainer(composefile, container) {
-  sh "docker-compose -f ${composefile}.yml logs ${container}.local | gzip > ${container}.log.gz"
-  archive("${container}.log.gz")
+  try {
+    sh "docker compose -f ${composefile}.yml logs ${container}.local | gzip > ${container}.log.gz"
+    archiveArtifacts artifacts: "${container}.log.gz", allowEmptyArchive: true
+  } catch (ex) {
+    println "Failed to log container ${container}: ${ex.getMessage()}"
+    // Create an empty log file so we know it was attempted
+    sh "echo 'Failed to retrieve logs for ${container}: ${ex.getMessage()}' | gzip > ${container}.log.gz"
+    archiveArtifacts artifacts: "${container}.log.gz", allowEmptyArchive: true
+  }
 }
 
 // Check if the current directory has any git changes. Return a list of all the
