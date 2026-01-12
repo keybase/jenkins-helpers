@@ -158,9 +158,10 @@ def containerName(composefile, container) {
   return sh(returnStdout: true, script: "docker compose -f ${composefile}.yml ps -aq ${container}.local").trim()
 }
 
-def logContainer(composefile, container) {
+def logContainer(composefile, container, project = null) {
+  def projectFlag = project ? "-p ${project}" : ""
   try {
-    sh "docker compose -f ${composefile}.yml logs ${container}.local | gzip > ${container}.log.gz"
+    sh "docker compose ${projectFlag} -f ${composefile}.yml logs ${container}.local | gzip > ${container}.log.gz"
     archiveArtifacts artifacts: "${container}.log.gz", allowEmptyArchive: true
   } catch (ex) {
     println "Failed to log container ${container}: ${ex.getMessage()}"
