@@ -155,7 +155,7 @@ def withKbweb(closure) {
 }
 
 def containerName(composefile, container) {
-  return sh(returnStdout: true, script: "docker compose -f ${composefile}.yml ps -q ${container}.local").trim()
+  return sh(returnStdout: true, script: "docker compose -f ${composefile}.yml ps -aq ${container}.local").trim()
 }
 
 def logContainer(composefile, container) {
